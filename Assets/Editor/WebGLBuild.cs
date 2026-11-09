@@ -8,6 +8,8 @@ public static class WebGLBuild
         // GitHub Pages can't serve Content-Encoding for .br/.gz, so ship uncompressed (Pages gzips on its own)
         PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled;
 
+        PlayerSettings.SplashScreen.show = false;
+
         var options = new BuildPlayerOptions
         {
             scenes = System.Array.ConvertAll(
