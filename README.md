@@ -1,43 +1,27 @@
 # LAB RATS
-[![Watch the Video]((https://github.com/Bloodyludi/ggj-2024/assets/63453493/d1d338ff-dfe4-4be6-833b-d8e789ee5f9c))](https://github.com/Bloodyludi/ggj-2024/assets/63453493/b54f8870-d8f9-406b-92d6-471b77fd0c1e)
 
-##  [Play it now!](https://www.llauer.de/ggj-2024/)
-##  [Play this fork (GitHub Pages)](https://rloretor.github.io/rat-labs/)
+## [Play it now!](https://rloretor.github.io/rat-labs/)
 
-## Overview
-LAB RATS is a 2-player game where players embody 2 lab rats trying to survive a wicked experiment. The rats need to dance to the beat of the song while also dodging the hazardous tiles. 
-
----
-
-## Downloads
-## Downloads
-* [DOWNLOAD (MACOS)](https://github.com/Bloodyludi/ggj-2024/blob/main/docs/mac_builds/mac_build.zip)
-* [DOWNLOAD (WINDOWS)](https://github.com/Bloodyludi/ggj-2024/blob/main/docs/mac_builds/lab_rats_win.zip)
+2-player local game from Global Game Jam 2024. You and a friend are lab rats in a wicked experiment: dance to the beat of the music on a 5x8 dancefloor while dodging hazardous tiles.
 
 ## Gameplay
-1. Both players start on the field
-2. Players move around the field at the sound of the music, the more sync the more combo!
-3. The players must dodge the hazards
-5. If a two players collide they will fight and will be projected in random directions
-6. The game continues until both players are dead or until the countdown finishes, the winner will be the one with the highest combo
-   
-## Controls
-- Move character: WASD/ arrow keys
+1. Both rats start on the dancefloor and pick a song from the main menu.
+2. Move in time with the music. Every on-beat move adds to your combo, an off-beat press resets it.
+3. Dodge the deadly tiles, which move every beat. Touching one kills you.
+4. If both rats collide they are stunned and flung in random directions.
+5. The match lasts 180 seconds. The last rat alive wins, or the highest combo if both survive. The board wraps around every edge.
 
-## Features
-- Fast-paced, local 2 player action
-- Simple, intuitive controls
-- Amazing pixel-art style
-- Unique soul-crushing sounds
-- Amazing sound beats!
+## Controls
+Both players share one keyboard.
+
+| Player | Keys |
+|--------|------|
+| Player 1 | W A S D |
+| Player 2 | Arrow keys |
 
 ## Requirements
-- Keyboard, Controller
-- Mac, Windows
-- Graphics card with at least 128 MB of VRAM
+- A desktop browser with WebGL and a keyboard (no controller or touch support)
 
-## Watch the Trailer
-Check out the official trailer to see what you are missing!
-
-## Disclaimer
-The code is a beauty to admire through the lense of abstract art.
+## Development
+- Unity 6000.3 (WebGL build target only)
+- Build the web version: `Unity -batchmode -nographics -quit -projectPath . -buildTarget WebGL -executeMethod WebGLBuild.Build`, then copy `build/WebGL` into `docs/` (served by GitHub Pages from `main` `/docs`)
