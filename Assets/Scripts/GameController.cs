@@ -1,5 +1,5 @@
-using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum GameResult
@@ -12,56 +12,68 @@ public enum GameResult
 
 public class GameController : MonoBehaviour
 {
-    public event Action OnCustomUpdate;
-    [SerializeField] private PlayerManager playerManager;
-    [SerializeField] private MapManager mapManager;
+    private PlayerManager playerManager;
+    private MapManager mapManager;
     [SerializeField] private GameOverScreen gameOverScreen;
     [SerializeField] private CountdownTimer countdownTimer;
-    [SerializeField] private SoundManager soundManager;
-    [SerializeField] private BeatManager beatManager;
+    private SoundManager soundManager;
+    private BeatManager beatManager;
     [SerializeField] private int matchDurationSeconds = 180;
-    [SerializeField] private int musicSpeedUpThreshold = 60;
 
     private float matchTimeElapsed;
-    private bool isSpeedUpTriggered1;
-    private bool isSpeedUpTriggered2;
 
     public bool IsGameOver { get; private set; } = false;
     public GameResult gameResult = GameResult.Draw;
 
     private void Awake()
     {
+        Services.Register(this);
+    }
+
+    private void Start()
+    {
+        playerManager = Services.Get<PlayerManager>();
+        mapManager = Services.Get<MapManager>();
+        soundManager = Services.Get<SoundManager>();
+        beatManager = Services.Get<BeatManager>();
+
         Time.timeScale = 1f;
 
-        isSpeedUpTriggered1 = false;
-        isSpeedUpTriggered2 = false;
-        soundManager.Init();
+        if (soundManager) soundManager.Init();
+        mapManager.SetDeadlyTileSpawns(soundManager.CurrentSong.deadlyTileSpawns);
         StartCoroutine(StartMatch());
-
     }
 
     private IEnumerator StartMatch()
     {
-        soundManager.PlayMusic();
-        beatManager.ShouldPerformTicks = true;
+        // Wait until players are spawned by PlayerManager
+        yield return new WaitUntil(() => playerManager.PlayerStates.Count >= 2);
+
+        if (soundManager) soundManager.PlayMusic();
+        if (beatManager) beatManager.ShouldPerformTicks = true;
+
         while (true)
         {
             var timeLeft = matchDurationSeconds - matchTimeElapsed;
-            countdownTimer.UpdateTimeLeft(timeLeft);
+            if (countdownTimer) countdownTimer.UpdateTimeLeft(timeLeft);
 
             matchTimeElapsed += Time.deltaTime;
 
-            if (matchTimeElapsed > 5f &&
-                playerManager.player1State.CurrentStateEnum == PlayerStateEnum.Dead
-                && playerManager.player2State.CurrentStateEnum == PlayerStateEnum.Dead)
+            if (AllPlayersDead())
             {
-                Time.timeScale = Mathf.Lerp(Time.timeScale, 6f, Time.deltaTime * 0.2f);
+                // Pause for dramatic effect
+                yield return new WaitForSeconds(1.5f);
+
+                // Snap timer to 0
+                if (countdownTimer) countdownTimer.UpdateTimeLeft(0);
+
+                EvaluateGameOver();
+                yield break;
             }
 
             if (matchTimeElapsed > matchDurationSeconds)
             {
                 EvaluateGameOver();
-
                 yield break;
             }
 
@@ -69,20 +81,35 @@ public class GameController : MonoBehaviour
         }
     }
 
+    private bool AllPlayersDead()
+    {
+        List<PlayerState> states = playerManager.PlayerStates;
+        for (int i = 0; i < states.Count; i++)
+        {
+            if (states[i].CurrentStateEnum != PlayerStateEnum.Dead)
+                return false;
+        }
+        return true;
+    }
+
     public void GameOver()
     {
-        beatManager.ShouldPerformTicks = false;
+        if (beatManager) beatManager.ShouldPerformTicks = false;
         PauseGame(true);
-        gameOverScreen.Show(gameResult);
+        if (gameOverScreen) gameOverScreen.Show(gameResult);
         IsGameOver = true;
     }
 
     private void EvaluateGameOver()
     {
-        var p1Dead = playerManager.player1State.CurrentStateEnum == PlayerStateEnum.Dead;
-        var p2Dead = playerManager.player2State.CurrentStateEnum == PlayerStateEnum.Dead;
-        var p1ComboCount = playerManager.player1State.ComboCounter;
-        var p2ComboCount = playerManager.player2State.ComboCounter;
+        var states = playerManager.PlayerStates;
+        if (states.Count < 2) return;
+
+        var p1Dead = states[0].CurrentStateEnum == PlayerStateEnum.Dead;
+        var p2Dead = states[1].CurrentStateEnum == PlayerStateEnum.Dead;
+        var p1ComboCount = states[0].ComboCounter;
+        var p2ComboCount = states[1].ComboCounter;
+
         if (p1Dead && p2Dead)
         {
             gameResult = GameResult.Lose;
@@ -107,7 +134,7 @@ public class GameController : MonoBehaviour
         {
             gameResult = GameResult.Draw;
         }
-        
+
         GameOver();
     }
 

@@ -27,7 +27,7 @@ public class GameOverScreen : MonoBehaviour
     public void Replay()
     {
         // animator.SetBool(ShowHash, false);
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene("GamePlay");
     }
 
     public void ExitToMainMenu()

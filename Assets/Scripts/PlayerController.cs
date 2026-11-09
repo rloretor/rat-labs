@@ -4,36 +4,43 @@ using UnityEngine.InputSystem;
 
 public partial class PlayerController : MonoBehaviour
 {
-    [SerializeField] private PlayerState playerState;
+    private PlayerState playerState;
     [SerializeField] private PlayerInput playerInput;
     [SerializeField] private PlayerLocalAnimationController playerLocalAnimationController;
+
     private BeatManager beatManager;
     private Vector2 moveDir = Vector2.zero;
-    
+
     private SoundManager soundManager;
     private float blockedUntil;
-    
+
     private MapManager mapManager;
 
-    private void Awake()
+    public void Init(MapManager mapManager)
     {
-        soundManager = GameObject.FindWithTag("Sound")?.GetComponent<SoundManager>();
-        beatManager = GameObject.FindObjectOfType<BeatManager>();
-        mapManager = GameObject.Find("Map").GetComponent<MapManager>();
+        playerState = GetComponent<PlayerState>();
+        this.soundManager = Services.Get<SoundManager>();
+        this.beatManager = Services.Get<BeatManager>();
+        this.mapManager = mapManager;
         mapManager.RegisterPlayer(this);
 
-        beatManager.OnPostBeat -= CheckPlayerMoved;
-        beatManager.OnPostBeat += CheckPlayerMoved;
+        if (beatManager != null)
+        {
+            beatManager.OnPostBeat -= CheckPlayerMoved;
+            beatManager.OnPostBeat += CheckPlayerMoved;
+        }
     }
 
     private void OnEnable()
     {
-        playerInput.onActionTriggered += EventHandler;
+        if (playerInput != null)
+            playerInput.onActionTriggered += EventHandler;
     }
 
     private void OnDisable()
     {
-        playerInput.onActionTriggered -= EventHandler;
+        if (playerInput != null)
+            playerInput.onActionTriggered -= EventHandler;
     }
 
     private void EventHandler(InputAction.CallbackContext context)
@@ -43,13 +50,12 @@ public partial class PlayerController : MonoBehaviour
             return;
         }
 
-        switch (context.action.name)
+        if (context.action.name == "move" && context.phase == InputActionPhase.Started)
         {
-            case "move":
-                OnMoveRegistered(context);
-                break;
+            AttemptMove(context.ReadValue<Vector2>());
         }
     }
+
     private void RestartRoutine(IEnumerator routine)
     {
         if (currentMoveRoutine != null)
@@ -57,14 +63,14 @@ public partial class PlayerController : MonoBehaviour
             StopCoroutine(currentMoveRoutine);
         }
 
-        currentMoveRoutine =routine;
+        currentMoveRoutine = routine;
         StartCoroutine(currentMoveRoutine);
     }
 
     public void Kill()
     {
         playerState.CurrentStateEnum = PlayerStateEnum.Dead;
-        
+
         if (currentMoveRoutine != null)
         {
             StopCoroutine(currentMoveRoutine);

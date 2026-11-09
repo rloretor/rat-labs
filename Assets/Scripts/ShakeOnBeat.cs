@@ -1,6 +1,5 @@
-using System;
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class ShakeOnBeat : MonoBehaviour
@@ -8,28 +7,23 @@ public class ShakeOnBeat : MonoBehaviour
     private BeatManager beatManager;
     [SerializeField] private float magnitude = 2;
     [SerializeField, Range(0, 0.5f)] private float percentOfWindowSeconds = 0.3f;
-    private Vector3 originalPos;
 
-    private void Awake()
+    private void OnEnable()
     {
-        beatManager = FindObjectOfType<BeatManager>();
+        beatManager = Services.Get<BeatManager>();
+        if (beatManager) beatManager.OnBeat += OnBeatManagerOnOnBeat;
     }
 
     private void OnDisable()
     {
-        beatManager.OnBeat -= OnBeatManagerOnOnBeat;
-    }
-
-    private void OnEnable()
-    {
-        beatManager.OnBeat += OnBeatManagerOnOnBeat;
+        if (beatManager) beatManager.OnBeat -= OnBeatManagerOnOnBeat;
     }
 
     void OnBeatManagerOnOnBeat()
     {
-        StartCoroutine(Shake(beatManager.MoveWindowSeconds * percentOfWindowSeconds, magnitude));
+        if (beatManager)
+            StartCoroutine(Shake(beatManager.MoveWindowSeconds * percentOfWindowSeconds, magnitude));
     }
-
 
     public IEnumerator Shake(double duration, float magnitude)
     {

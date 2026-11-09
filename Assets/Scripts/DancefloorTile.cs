@@ -19,9 +19,9 @@ public class DancefloorTile : MonoBehaviour
 
     public float TileSize => ren.sprite.bounds.size.x;
 
-    private void Awake()
+    public void Init(BeatManager beatManager)
     {
-        beatManager = GameObject.FindObjectOfType<BeatManager>();
+        this.beatManager = beatManager;
     }
 
     public void SetDeadly(bool deadly)
@@ -45,14 +45,13 @@ public class DancefloorTile : MonoBehaviour
 
         while (true)
         {
-            var t = (float)(1f - (beatManager.NextBeatTime -
-#if !UNITY_WEBGL
-                                  AudioSettings.dspTime
-#else
-                                  Time.timeAsDouble
-#endif
+            if (beatManager == null)
+            {
+                yield return null;
+                continue;
+            }
 
-                ) / beatManager.BeatInterval);
+            var t = (float)(1f - (beatManager.NextBeatTime - beatManager.GetCurrentTime()) / beatManager.BeatInterval);
 
             if (isDeadly)
             {
