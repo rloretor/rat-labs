@@ -102,5 +102,5 @@ Assets/
 
 ## Build Target
 - **WebGL only** - live at https://www.llauer.de/ggj-2024/
-- CI: `.github/workflows/webgl.yml` builds via GameCI (`Assets/Editor/WebGLBuild.cs`, compression disabled for GitHub Pages) and deploys to https://rloretor.github.io/rat-labs/ on push to main. Needs repo secrets `UNITY_LICENSE`, `UNITY_EMAIL`, `UNITY_PASSWORD`.
+- Local WebGL build: Unity menu or `WebGLBuild.Build` (`Assets/Editor/WebGLBuild.cs`, outputs `build/WebGL`, compression disabled so it can be hosted on GitHub Pages).
 - All code must be WebGL-compatible (see WebGL Constraints above)
