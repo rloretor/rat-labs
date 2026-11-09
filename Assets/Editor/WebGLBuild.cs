@@ -9,6 +9,7 @@ public static class WebGLBuild
         PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled;
 
         PlayerSettings.SplashScreen.show = false;
+        PlayerSettings.SplashScreen.showUnityLogo = false;
 
         var options = new BuildPlayerOptions
         {
