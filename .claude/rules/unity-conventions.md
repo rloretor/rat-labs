@@ -76,7 +76,7 @@
 
 ## Scene Management
 - Scene transitions use `SceneManager.LoadScene(sceneName)`
-- Scene names: "SampleScene" (gameplay), "MainMenu", "HowTo", "Credits"
+- Scene names: "GamePlay" (gameplay), "MainMenu", "HowTo", "Credits"
 - Game pause uses `Time.timeScale = 0/1` (not scene loading)
 
 ## Asset References

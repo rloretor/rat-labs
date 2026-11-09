@@ -18,7 +18,7 @@ public class MainMenuController : MonoBehaviour
     [UsedImplicitly]
     public void OnStartGameButtonClicked()
     {
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene("GamePlay");
     }
 
     [UsedImplicitly]

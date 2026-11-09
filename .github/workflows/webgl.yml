@@ -1,0 +1,66 @@
+name: WebGL build & deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+  UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-WebGL-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: Library-WebGL-
+
+      - uses: game-ci/unity-builder@v4
+        with:
+          targetPlatform: WebGL
+          buildMethod: WebGLBuild.Build
+
+      # builder output is build/WebGL/WebGL when using a custom buildMethod path; index.html lives where we set it
+      - name: Locate build
+        run: |
+          dir=$(dirname "$(find build -name index.html | head -1)")
+          echo "BUILD_DIR=$dir" >> "$GITHUB_ENV"
+          touch "$dir/.nojekyll"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: WebGL
+          path: ${{ env.BUILD_DIR }}
+
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: ${{ env.BUILD_DIR }}
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

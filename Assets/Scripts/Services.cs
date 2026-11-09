@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class Services
 {
-    private static readonly Dictionary<Type, MonoBehaviour> registry = new();
+    private static readonly Dictionary<Type, UnityEngine.Object> registry = new();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void Init()
@@ -17,7 +17,7 @@ public static class Services
         registry[typeof(T)] = instance;
     }
 
-    public static T Get<T>() where T : MonoBehaviour
+    public static T Get<T>() where T : UnityEngine.Object
     {
         if (registry.TryGetValue(typeof(T), out var instance) && instance != null)
             return (T)instance;

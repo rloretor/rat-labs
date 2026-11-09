@@ -27,7 +27,7 @@ Assets/
     SongSelector.cs        # MainMenu UI component for cycling through songs
   SoundFX/
     SoundData/           # SongLevelData assets (Ludwig.asset, Ludwig 1.asset, Ludwig 2.asset)
-  Scenes/            # SampleScene (gameplay), MainMenu, HowTo, Credits, FireInTheHole
+  Scenes/            # GamePlay (gameplay), MainMenu, HowTo, Credits, FireInTheHole
   Prefabs/           # Player, GameController, DancefloorTile, GameUI, SoundManager
   Animators/         # Player 1 & Player 2 animator controllers + animations
   Art/               # Sprites, UI textures, particles
@@ -62,7 +62,7 @@ Assets/
 - **ScriptableObject configuration**: Song data (clip, BPM, delay, tile spawns) stored in `SongLevelData` assets
 - **GC-optimized per-beat callbacks**: Reusable caches (dictionaries, hash sets, lists) instead of LINQ allocations
 - **Data-driven player spawning**: PlayerManager uses a static spawn config array for player instantiation
-- **Cross-scene song selection**: `SongLibrary.SelectedSong` static property passes the player's song choice from MainMenu to SampleScene. SoundManager reads it in `Init()`, falling back to the Inspector-wired default if null.
+- **Cross-scene song selection**: `SongLibrary.SelectedSong` static property passes the player's song choice from MainMenu to GamePlay. SoundManager reads it in `Init()`, falling back to the Inspector-wired default if null.
 
 ## Game Mechanics Quick Reference
 - **Beat window**: 10% of beat interval on each side (configurable via MoveWindowTimePercent, overridable per-song via SongLevelData.moveWindowTimePercent)
@@ -102,4 +102,5 @@ Assets/
 
 ## Build Target
 - **WebGL only** - live at https://www.llauer.de/ggj-2024/
+- CI: `.github/workflows/webgl.yml` builds via GameCI (`Assets/Editor/WebGLBuild.cs`, compression disabled for GitHub Pages) and deploys to https://rloretor.github.io/rat-labs/ on push to main. Needs repo secrets `UNITY_LICENSE`, `UNITY_EMAIL`, `UNITY_PASSWORD`.
 - All code must be WebGL-compatible (see WebGL Constraints above)

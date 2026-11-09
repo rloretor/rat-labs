@@ -96,7 +96,7 @@ Created via Assets > Create > Lab Rats > Song Level Data. Referenced by SoundMan
 
 Cross-scene song selection system:
 - **SongLibrary** (ScriptableObject): Holds array of `SongLevelData` assets. Created via Assets > Create > Lab Rats > Song Library.
-- **SongLibrary.SelectedSong** (static property): Set by SongSelector in MainMenu, read by SoundManager.Init(). Null if MainMenu was skipped (e.g., launching SampleScene directly from Editor).
+- **SongLibrary.SelectedSong** (static property): Set by SongSelector in MainMenu, read by SoundManager.Init(). Null if MainMenu was skipped (e.g., launching GamePlay directly from Editor).
 - **SongSelector** (MonoBehaviour): MainMenu UI component with `NextSong()`/`PreviousSong()` methods (wired to buttons via Inspector). Displays `"Song: <name>"` via TMP_Text. Fires `OnSongChanged` event (`Action<SongLevelData>`) on every selection change (including initial `Start()`).
 - **Fallback**: If `SongLibrary.SelectedSong` is null, SoundManager uses its Inspector-wired `currentSong` field (backward-compatible).
 
@@ -180,14 +180,14 @@ Static class providing `PacedForLoop(float duration, Action<float>)`:
 ```
 MainMenu (MainMenuController + SongSelector)
   ├── Song Selector ─> SongSelector cycles SongLibrary, sets SongLibrary.SelectedSong
-  ├── Start Game ────> SampleScene (SoundManager reads SelectedSong in Init())
+  ├── Start Game ────> GamePlay (SoundManager reads SelectedSong in Init())
   ├── How To ────────> HowTo scene (HowToController)
   ├── Credits ───────> Credits scene (CreditsController)
   └── Exit ──────────> Application.Quit() (no-op in WebGL)
 
-SampleScene (gameplay)
+GamePlay (gameplay)
   ├── PauseScreen ──> Resume / Quit to MainMenu
-  └── GameOverScreen ──> Replay (reload SampleScene) / MainMenu
+  └── GameOverScreen ──> Replay (reload GamePlay) / MainMenu
 ```
 
 ## Win Condition Logic (GameController.cs)
